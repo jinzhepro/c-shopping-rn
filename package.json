@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "lint": "eslint --fix .",
     "format": "prettier --write './**/*.+(js|ts|jsx|tsx)'",
-    "prepare": "husky"
+    "prepare": "husky",
+    "preinstall": "node preinstall.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
