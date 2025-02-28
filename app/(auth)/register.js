@@ -1,117 +1,71 @@
-import { yupResolver } from '@hookform/resolvers/yup'
 import { Link, Stack, useRouter } from 'expo-router'
-import { useEffect } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
-import { ScrollView, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
-import { Button, HandleResponse, Logo, TextField } from '@/components'
-import { useAppDispatch } from '@/hooks'
-import { useCreateUserMutation } from '@/services'
-import { userLogin } from '@/store'
-import { registerSchema } from '@/utils'
+import { Button, Logo, TextField } from '@/components'
 
 export default function RegisterScreen() {
-  //? Assets
-  const dispatch = useAppDispatch()
   const router = useRouter()
-
-  //? Create User
-  const [createUser, { data, isSuccess, isError, isLoading, error }] = useCreateUserMutation()
-
-  //? Form Hook
-  const {
-    handleSubmit,
-    formState: { errors: formErrors },
-    setFocus,
-    control,
-  } = useForm({
-    resolver: yupResolver(registerSchema),
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+  const { control } = useForm({
+    defaultValues: {
+      email: '',
+    }
   })
 
-  //? Focus On Mount
-  useEffect(() => {
-    setFocus('name')
-  }, [])
-
-  //? Handlers
-  const onSubmit = ({ name, email, password }) => {
-    if (name && email && password) {
-      createUser({
-        body: { name, email, password },
-      })
-    }
-  }
-
-  const onSuccess = () => {
-    dispatch(userLogin(data.data.token))
-    router.back()
+  const handleSendCode = () => {
+    router.push('/verify')
   }
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: '注册',
+          title: 'Register',
           headerBackTitleVisible: false,
         }}
       />
-      {/*  Handle Login Response */}
-      {(isSuccess || isError) && (
-        <HandleResponse
-          isError={isError}
-          isSuccess={isSuccess}
-          error={error?.data?.message}
-          message="注册成功"
-          onSuccess={onSuccess}
-        />
-      )}
-      <ScrollView className="h-[100%] bg-white pt-10">
-        <View className="w-[100vw] px-8 py-6 space-y-4">
-          <Logo className="mx-auto w-40 h-16" />
-          <Text className=" mt-56">注册</Text>
-          <View className="space-y-0">
-            <TextField
-              errors={formErrors.name}
-              placeholder="请输入您的账户名称"
-              name="name"
-              control={control}
-            />
-            <TextField
-              errors={formErrors.email}
-              placeholder="请输入您的账户邮箱"
-              name="email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              control={control}
-            />
+      <View className="h-[100%] bg-white pt-10">
+        <View className="w-[100vw] px-8 py-6 space-y-4 h-full flex justify-between">
+          <View>
+            <Logo className="mx-auto w-40 h-16" />
 
-            <TextField
-              errors={formErrors.password}
-              secureTextEntry
-              placeholder="请输入您的账户密码"
-              name="password"
-              control={control}
-            />
-            <TextField
-              control={control}
-              errors={formErrors.confirmPassword}
-              secureTextEntry
-              placeholder="确认密码，请再次输入"
-              name="confirmPassword"
-            />
-            <Button isLoading={isLoading} onPress={handleSubmit(onSubmit)}>
-              注册
-            </Button>
+            <View className="space-y-4 mt-8">
+              <TextField
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                control={control}
+                name="email"
+              />
+
+              <Button 
+                className="bg-red-500 rounded-full"
+                onPress={handleSendCode}
+              >
+                Send Code
+              </Button>
+            </View>
           </View>
-          <View className="flex flex-row">
-            <Text className="inline mr-2 text-gray-800 text-xs">我已经有账户了</Text>
-            <Link replace href="/login" className="text-blue-400 text-xs">
-              去登录
-            </Link>
+
+          <View className="space-y-6">
+            <View className="flex flex-row justify-center">
+              <Text className="text-gray-800 text-sm mr-1">Already have an account?</Text>
+              <Link replace href="/login" className="text-red-500 text-sm font-semibold">
+                Sign In
+              </Link>
+            </View>
+
+            <View>
+              <Text className="text-center text-gray-500 text-xs">
+                By continuing, you agree to our{' '}
+                <Text className="text-gray-700">Terms of Service</Text> and{' '}
+                <Text className="text-gray-700">Privacy Policy</Text>
+              </Text>
+            </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </>
   )
 }
